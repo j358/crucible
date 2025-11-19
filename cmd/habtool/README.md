@@ -76,7 +76,7 @@ Operation
 ```
 Usage: habtool [OPTIONS]
   -h                  Show this help
-  -z <crypto backend> "file" (default) or "gcp"
+  -z <crypto backend> "file" (default), "gcp" for Google Cloud, "azv" for Azure KeyVault
 
 SRK CA creation options:
   -C <output path>    SRK private key in PEM format

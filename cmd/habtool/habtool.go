@@ -27,6 +27,7 @@ import (
 const (
 	BackendFile = "file"
 	BackendGCP  = "gcp"
+	BackendAzv  = "azv"
 )
 
 type Config struct {
@@ -60,6 +61,8 @@ func (c Config) getCert(ctx context.Context, f string) (*x509.Certificate, error
 		return certFromFile(ctx, f)
 	case BackendGCP:
 		return certFromGCP(ctx, f)
+	case BackendAzv:
+		return certFromAzv(ctx, f)
 	default:
 		return nil, fmt.Errorf("unknown backend %q", c.backend)
 	}
@@ -71,6 +74,8 @@ func (c Config) getSigner(ctx context.Context, f string) (crypto.Signer, error) 
 		return signerFromFile(ctx, f)
 	case BackendGCP:
 		return signerFromGCP(ctx, f)
+	case BackendAzv:
+		return signerFromAzv(ctx, f)
 	default:
 		return nil, fmt.Errorf("unknown backend %q", c.backend)
 	}
@@ -152,7 +157,7 @@ The use of this tool is therefore **at your own risk**.
 
 const usage = `Usage: habtool [OPTIONS]
   -h                  Show this help
-  -z <backend> "file" (default) or "gcp"
+  -z <crypto backend> "file" (default), "gcp" for Google Cloud, "azv" for Azure KeyVault
 
 SRK CA creation options:
   -C <output path>    SRK private key in PEM format
@@ -168,19 +173,19 @@ CSF/IMG certificates creation options:
   -b <output path>    IMG public  key in PEM format
 
 SRK table creation options:
-  -1 <input path>     SRK public key 1 ("file": PEM format, "gcp": resource ID)
-  -2 <input path>     SRK public key 2 ("file": PEM format, "gcp": resource ID)
-  -3 <input path>     SRK public key 3 ("file": PEM format, "gcp": resource ID)
-  -4 <input path>     SRK public key 4 ("file": PEM format, "gcp": resource ID)
+  -1 <input path>     SRK public key 1 ("file": PEM format, "gcp": resource ID, "azv": vault/cert)
+  -2 <input path>     SRK public key 2 ("file": PEM format, "gcp": resource ID, "azv": vault/cert)
+  -3 <input path>     SRK public key 3 ("file": PEM format, "gcp": resource ID, "azv": vault/cert)
+  -4 <input path>     SRK public key 4 ("file": PEM format, "gcp": resource ID, "azv": vault/cert)
 
   -o <output path>    Write SRK table hash to file
   -t <output path>    Write SRK table to file
 
 Executable signing options:
-  -A <input path>     CSF private key ("file": PEM format, "gcp": resource ID)
-  -a <input path>     CSF public  key ("file": PEM format, "gcp": resource ID)
-  -B <input path>     IMG private key ("file": PEM format, "gcp": resource ID)
-  -b <input path>     IMG public  key ("file": PEM format, "gcp": resource ID)
+  -A <input path>     CSF private key ("file": PEM format, "gcp": resource ID, "azv": vault/cert)
+  -a <input path>     CSF public  key ("file": PEM format, "gcp": resource ID, "azv": vault/cert)
+  -B <input path>     IMG private key ("file": PEM format, "gcp": resource ID, "azv": vault/cert)
+  -b <input path>     IMG public  key ("file": PEM format, "gcp": resource ID, "azv": vault/cert)
   -t <input path>     Read SRK table from file
   -x <1-4>            Index for SRK key
   -e <id>             Crypto engine (e.g. 0x1b for HAB_ENG_DCP)
