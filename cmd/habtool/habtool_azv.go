@@ -18,6 +18,7 @@ func certFromAzv(_ context.Context, path string) (*x509.Certificate, error) {
 	var err error
 	// split path into vault and cert name
 	vault, keyName := filepath.Split(path)
+	vault = filepath.Clean(vault)
 	if len(vault) <= 5 || len(keyName) <= 5 {
 		return nil, fmt.Errorf("invalid path %q, must be in format vault/cert, minimum length is 6 for each", path)
 	}
@@ -56,6 +57,7 @@ func signerFromAzv(_ context.Context, path string) (crypto.Signer, error) {
 	var err error
 	// split path into vault and cert name
 	vault, keyName := filepath.Split(path)
+	vault = filepath.Clean(vault)
 	if len(vault) <= 5 || len(keyName) <= 5 {
 		return nil, fmt.Errorf("invalid path %q, must be in format vault/cert, minimum length is 6 for each", path)
 	}
